@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qadamedu — Білім беру платформасы</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            primary: '#2563eb',
+                            indigo: '#4f46e5'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- ТАҢБАЛАМА / ХАБАРЛАМА (TOAST) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-in-out px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-white font-medium max-w-md pointer-events-none">
+        <i id="toast-icon" class="fas fa-info-circle text-xl"></i>
+        <span id="toast-message">Хабарлама мәтіні</span>
+    </div>
+
+    <!-- МӘЗІР / HEADER -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
+                <div class="w-12 h-12 bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 text-white font-bold text-2xl">
+                    Q
+                </div>
+                <div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Qadamedu</span>
+                    <p class="text-xs text-slate-500 hidden sm:block">Оқу платформасының әмбебап шаблоны</p>
+                </div>
+            </div>
+
+            <!-- Жеке кабинет ақпараты / Шығу -->
+            <div id="nav-user-info" class="flex items-center space-x-4">
+                <!-- Javascript арқылы толықтырылады -->
+            </div>
+        </div>
+    </header>
+
+    <!-- НЕГІЗГІ ОРТА (MAIN CONTENT AREA) -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- 1. БАСТЫ БЕТ (HOME VIEW) -->
+        <section id="view-home" class="view-section space-y-12">
+            <!-- Hero секциясы -->
+            <div class="text-center space-y-6 py-8 max-w-3xl mx-auto">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <i class="fas fa-sparkles text-blue-500"></i> Заманауи білім жүйесі
+                </span>
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
+                    Білім алу мен оқытудың <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 bg-clip-text text-transparent">жаңа деңгейі</span>
+                </h1>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    Кез келген пәнге арналған әмбебап платформа. Мұғалімдер үшін курстар, сабақтар мен тесттер құрастыру, ал оқушылар үшін онлайн білім алу оңай әрі тиімді.
+                </p>
+                
+                <!-- Негізгі кіру батырмалары -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                    <button onclick="openTeacherAuthModal()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 text-lg">
+                        <i class="fas fa-chalkboard-teacher text-xl"></i>
+                        <span>Мұғалім ретінде кіру</span>
+                    </button>
+                    <button onclick="switchView('student-login')" class="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-800 font-semibold border-2 border-slate-200 hover:border-slate-300 rounded-2xl shadow-sm transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 text-lg">
+                        <i class="fas fa-user-graduate text-xl text-blue-600"></i>
+                        <span>Оқушы ретінде кіру</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Мүмкіндіктер баннері -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Интерактивті оқыту</h3>
+                    <p class="text-slate-600 text-base">Теориялық материалдар, тапсырмалар мен HTML-тренажерлерді бір жерден оқып үйреніңіз.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Автоматты тексеру</h3>
+                    <p class="text-slate-600 text-base">Онлайн тесттерді тапсырыңыз, нәтижесі бірден есептеліп мұғалімге жіберіледі.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Үй тапсырмасы (PDF/PPTX)</h3>
+                    <p class="text-slate-600 text-base">Оқушылар өз презентациялары мен PDF файлдарын қауіпсіз форматта оңай жүктей алады.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ОҚУШЫ КІРУ БЕТІ (STUDENT LOGIN VIEW) -->
+        <section id="view-student-login" class="view-section hidden max-w-md mx-auto">
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-2">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Оқушы кабинетіне кіру</h2>
+                    <p class="text-sm text-slate-500">Мұғалім берген курс кодын және аты-жөніңізді енгізіңіз</p>
+                </div>
+
+                <form onsubmit="handleStudentLogin(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Аты-жөніңіз</label>
+                        <input type="text" id="student-name-input" required placeholder="Мысалы: Арман Әлиев" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Курс коды</label>
+                        <input type="text" id="student-code-input" required placeholder="Мысалы: MATH-5A" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase text-base tracking-wider font-semibold">
+                        <p class="text-xs text-slate-400 mt-1">Демо-курс үшін <b>MATH-5A</b> кодын пайдаланыңыз</p>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md shadow-blue-500/20 transition-all text-base">
+                        Курсқа кіру <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </form>
+                <div class="text-center pt-2">
+                    <button onclick="switchView('home')" class="text-sm text-slate-500 hover:text-slate-700 font-medium">
+                        <i class="fas fa-chevron-left mr-1"></i> Басты бетке оралу
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. МҰҒАЛІМ КАБИНЕТІ (TEACHER DASHBOARD VIEW) -->
+        <section id="view-teacher-dashboard" class="view-section hidden space-y-8">
+            <!-- Жоғарғы статистика -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">Курстар саны</p>
+                        <h4 id="stat-courses" class="text-2xl font-extrabold text-slate-900">0</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">Тіркелген оқушылар</p>
+                        <h4 id="stat-students" class="text-2xl font-extrabold text-slate-900">0</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+                        <i class="fas fa-poll-h"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">Тест нәтижелері</p>
+                        <h4 id="stat-results" class="text-2xl font-extrabold text-slate-900">0</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">Жіберілген үй тапсырмалары</p>
+                        <h4 id="stat-homeworks" class="text-2xl font-extrabold text-slate-900">0</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Табтар / Басқару Бөлімдері -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="border-b border-slate-200 bg-slate-50/50 px-6 pt-4 flex flex-wrap gap-2 custom-scrollbar overflow-x-auto">
+                    <button onclick="switchTeacherTab('tab-courses')" id="btn-tab-courses" class="teacher-tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl border-b-2 border-blue-600 text-blue-600 bg-white shadow-xs">
+                        <i class="fas fa-book mr-2"></i>Курстар
+                    </button>
+                    <button onclick="switchTeacherTab('tab-create-course')" id="btn-tab-create-course" class="teacher-tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl text-slate-600 hover:text-slate-900">
+                        <i class="fas fa-plus-circle mr-2"></i>Жаңа курс құру
+                    </button>
+                    <button onclick="switchTeacherTab('tab-add-material')" id="btn-tab-add-material" class="teacher-tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl text-slate-600 hover:text-slate-900">
+                        <i class="fas fa-file-signature mr-2"></i>Материал қосу
+                    </button>
+                    <button onclick="switchTeacherTab('tab-add-quiz')" id="btn-tab-add-quiz" class="teacher-tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl text-slate-600 hover:text-slate-900">
+                        <i class="fas fa-question-circle mr-2"></i>Тест құрастыру
+                    </button>
+                    <button onclick="switchTeacherTab('tab-add-assignment')" id="btn-tab-add-assignment" class="teacher-tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl text-slate-600 hover:text-slate-900">
+                        <i class="fas fa-tasks mr-2"></i>Үй тапсырмасын жариялау
+                    </button>
+                    <button onclick="switchTeacherTab('tab-test-results')" id="btn-tab-test-results" class="teacher-tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl text-slate-600 hover:text-slate-900">
+                        <i class="fas fa-chart-bar mr-2"></i>Тест нәтижелері
+                    </button>
+                    <button onclick="switchTeacherTab('tab-homework-submissions')" id="btn-tab-homework-submissions" class="teacher-tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl text-slate-600 hover:text-slate-900">
+                        <i class="fas fa-file-alt mr-2"></i>Үй тапсырмалары
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <!-- 5.1 ТАБ: КУРСТАР ТІЗІМІ -->
+                    <div id="tab-courses" class="teacher-tab-content space-y-6">
+                        <h3 class="text-xl font-bold text-slate-900">Белсенді курстар</h3>
+                        <div id="courses-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- JS арқылы толтырылады -->
+                        </div>
+                    </div>
+
+                    <!-- 5.1 ТАБ: ЖАҢА КУРС ҚҰРУ -->
+                    <div id="tab-create-course" class="teacher-tab-content hidden space-y-6 max-w-2xl">
+                        <h3 class="text-xl font-bold text-slate-900">Жаңа курс құру</h3>
+                        <form onsubmit="handleCreateCourse(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Курс атауы</label>
+                                <input type="text" id="course-title" required placeholder="Мысалы: Алгебра негіздері" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Пән</label>
+                                    <input type="text" id="course-subject" required placeholder="Мысалы: Математика" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Сынып</label>
+                                    <input type="text" id="course-grade" required placeholder="Мысалы: 5 «А»" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Қысқаша сипаттама</label>
+                                <textarea id="course-description" rows="3" required placeholder="Курстың мақсаты мен мазмұны..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Курсқа кіру коды (міндетті емес)</label>
+                                    <input type="text" id="course-code" placeholder="Бос болса автоматты құрылады" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase tracking-wider">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Оқушылардың максималды саны</label>
+                                    <input type="number" id="course-max-students" min="1" value="30" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition-all">
+                                <i class="fas fa-plus mr-2"></i> Курсты сақтау
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- 5.2 ТАБ: МАТЕРИАЛ ҚОСУ -->
+                    <div id="tab-add-material" class="teacher-tab-content hidden space-y-6 max-w-2xl">
+                        <h3 class="text-xl font-bold text-slate-900">Оқу материалы немесе тапсырма қосу</h3>
+                        <form onsubmit="handleAddMaterial(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Курсты таңдаңыз</label>
+                                <select id="material-course-select" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                                    <!-- JS арқылы курс опциялары -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Материал түрі</label>
+                                <select id="material-type" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                                    <option value="theory">Теория</option>
+                                    <option value="task">Тапсырма</option>
+                                    <option value="trainer">HTML тренажер</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Тақырыбы</label>
+                                <input type="text" id="material-title" required placeholder="Материал тақырыбы" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Мазмұны / Нұсқаулық</label>
+                                <textarea id="material-content" rows="6" required placeholder="Теориялық мәтін, негізгі ережелер немесе нұсқаулықтар..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                            </div>
+                            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition-all">
+                                <i class="fas fa-file-upload mr-2"></i> Материалды жариялау
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- 5.3 ТАБ: ТЕСТ ҚҰРАСТЫРУ -->
+                    <div id="tab-add-quiz" class="teacher-tab-content hidden space-y-6 max-w-2xl">
+                        <h3 class="text-xl font-bold text-slate-900">Тест сұрағын қосу</h3>
+                        <form onsubmit="handleAddQuizQuestion(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Курсты таңдаңыз</label>
+                                <select id="quiz-course-select" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                                    <!-- JS арқылы -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Сұрақ мәтіні</label>
+                                <input type="text" id="quiz-question" required placeholder="Сұрақты енгізіңіз..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">А нұсқасы</label>
+                                    <input type="text" id="quiz-opt-a" required placeholder="Жауап А" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Б нұсқасы</label>
+                                    <input type="text" id="quiz-opt-b" required placeholder="Жауап Б" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">В нұсқасы</label>
+                                    <input type="text" id="quiz-opt-c" required placeholder="Жауап В" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Г нұсқасы</label>
+                                    <input type="text" id="quiz-opt-d" required placeholder="Жауап Г" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Дұрыс жауап индексі</label>
+                                <select id="quiz-correct-index" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                                    <option value="0">А нұсқасы</option>
+                                    <option value="1">Б нұсқасы</option>
+                                    <option value="2">В нұсқасы</option>
+                                    <option value="3">Г нұсқасы</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition-all">
+                                <i class="fas fa-check-circle mr-2"></i> Сұрақты сақтау
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- 5.4 ТАБ: ҮЙ ТАПСЫРМАСЫН ЖАРИЯЛАУ -->
+                    <div id="tab-add-assignment" class="teacher-tab-content hidden space-y-6 max-w-2xl">
+                        <h3 class="text-xl font-bold text-slate-900">Үй тапсырмасын жариялау</h3>
+                        <form onsubmit="handleAddAssignment(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Курсты таңдаңыз</label>
+                                <select id="assign-course-select" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                                    <!-- JS арқылы -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Тапсырма тақырыбы</label>
+                                <input type="text" id="assign-title" required placeholder="Мысалы: Теңдеулер тақырыбына презентация әзірлеу" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Толық нұсқаулық</label>
+                                <textarea id="assign-instructions" rows="4" required placeholder="Тапсырма шарттары мен нұсқаулықтары..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Соңғы тапсыру күні мен уақыты (Дедлайн)</label>
+                                    <input type="datetime-local" id="assign-deadline" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Максималды балл</label>
+                                    <input type="number" id="assign-max-score" min="1" value="100" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Бағалау критерийлері</label>
+                                <input type="text" id="assign-criteria" placeholder="Мысалы: Дизайн, мазмұны, есептердің толықтығы" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition-all">
+                                <i class="fas fa-bullhorn mr-2"></i> Тапсырманы жариялау
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- 5.5 ТАБ: ТЕСТ НӘТИЖЕЛЕРІ КЕСТЕСІ -->
+                    <div id="tab-test-results" class="teacher-tab-content hidden space-y-6">
+                        <h3 class="text-xl font-bold text-slate-900">Оқушылардың тест нәтижелері</h3>
+                        <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-4">Оқушының аты-жөні</th>
+                                        <th class="px-6 py-4">Курс</th>
+                                        <th class="px-6 py-4">Жинаған ұпайы</th>
+                                        <th class="px-6 py-4">Пайыздық нәтиже</th>
+                                        <th class="px-6 py-4">Тапсырған күні мен уақыты</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="test-results-table-body" class="divide-y divide-slate-200 bg-white">
+                                    <!-- JS арқылы -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 5.6 ТАБ: ЖІБЕРІЛГЕН ҮЙ ТАПСЫРМАЛАРЫ КЕСТЕСІ -->
+                    <div id="tab-homework-submissions" class="teacher-tab-content hidden space-y-6">
+                        <h3 class="text-xl font-bold text-slate-900">Жіберілген үй тапсырмалары (PDF / PPTX)</h3>
+                        <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-4">Оқушы</th>
+                                        <th class="px-6 py-4">Курс / Тапсырма</th>
+                                        <th class="px-6 py-4">Файл атауы мен көлемі</th>
+                                        <th class="px-6 py-4">Жіберілген уақыт</th>
+                                        <th class="px-6 py-4">Мәртебесі</th>
+                                        <th class="px-6 py-4">Әрекет</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="homework-table-body" class="divide-y divide-slate-200 bg-white">
+                                    <!-- JS арқылы -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. ОҚУШЫ КАБИНЕТІ (STUDENT DASHBOARD VIEW) -->
+        <section id="view-student-dashboard" class="view-section hidden space-y-8">
+            <!-- Курс тақырыбы мен мағлұматы -->
+            <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-600 rounded-3xl p-8 text-white shadow-xl space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <span id="student-course-badge" class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-sm font-semibold tracking-wide">
+                        ПӘН • СЫНЫП
+                    </span>
+                    <span id="student-course-code-tag" class="px-3 py-1 bg-white/10 rounded-lg text-xs font-mono">
+                        КОД: MATH-5A
+                    </span>
+                </div>
+                <h1 id="student-course-title" class="text-3xl sm:text-4xl font-extrabold">Курс атауы</h1>
+                <p id="student-course-desc" class="text-blue-100 max-w-3xl text-base leading-relaxed">
+                    Курстың сипаттамасы...
+                </p>
+            </div>
+
+            <!-- Бөлімдер: Теория, Тест, Үй тапсырмасы -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Сол жақ (2 баған): Теория және Тапсырмалар -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Теориялық материалдар -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex items-center space-x-3 border-b border-slate-100 pb-4">
+                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold">
+                                <i class="fas fa-book-open text-lg"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900">Теориялық материалдар мен сабақтар</h3>
+                        </div>
+                        <div id="student-materials-list" class="space-y-6">
+                            <!-- JS арқылы толтырылады -->
+                        </div>
+                    </div>
+
+                    <!-- Интерактивті Тест Секциясы -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold">
+                                    <i class="fas fa-edit text-lg"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900">Бөлім бойынша тест</h3>
+                            </div>
+                            <span id="quiz-status-badge" class="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">Тапсырылмады</span>
+                        </div>
+
+                        <form id="student-quiz-form" onsubmit="handleStudentQuizSubmit(event)" class="space-y-6">
+                            <div id="student-quiz-questions-container" class="space-y-6">
+                                <!-- JS арқылы 10 сұрақ енгізіледі -->
+                            </div>
+                            <button type="submit" id="quiz-submit-btn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all text-base flex items-center justify-center gap-2">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Жауаптарды жіберу</span>
+                            </button>
+                        </form>
+
+                        <!-- Тест Нәтижесі Терезесі -->
+                        <div id="student-quiz-result-box" class="hidden p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-4">
+                            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl font-bold mx-auto">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold text-slate-900">Тест нәтижеңіз</h4>
+                            <div class="flex justify-center items-center gap-6">
+                                <div>
+                                    <p class="text-sm text-slate-500">Дұрыс жауап</p>
+                                    <p id="quiz-res-score" class="text-3xl font-extrabold text-blue-600">0 / 0</p>
+                                </div>
+                                <div class="h-10 w-px bg-slate-300"></div>
+                                <div>
+                                    <p class="text-sm text-slate-500">Пайыздық көрсеткіш</p>
+                                    <p id="quiz-res-percent" class="text-3xl font-extrabold text-emerald-600">0%</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500">Нәтижеңіз мұғалім кабинетіне автоматты түрде сақталды.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Оң жақ (1 баған): Үй Тапсырмасын Жіберу -->
+                <div class="space-y-8">
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex items-center space-x-3 border-b border-slate-100 pb-4">
+                            <div class="w-10 h-10 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center font-bold">
+                                <i class="fas fa-upload text-lg"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900">Үй тапсырмасын жіберу</h3>
+                        </div>
+
+                        <!-- Ағымдағы тапсырма ақпараты -->
+                        <div id="student-assignment-info" class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                            <!-- JS арқылы -->
+                        </div>
+
+                        <!-- Файл жүктеу формасы -->
+                        <form onsubmit="handleStudentHomeworkSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Файлды таңдаңыз (.PDF немесе .PPTX)</label>
+                                <div class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-4 text-center cursor-pointer transition-colors relative bg-slate-50/50">
+                                    <input type="file" id="homework-file-input" accept=".pdf,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="updateFileLabel(this)">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-slate-400 mb-2"></i>
+                                    <p id="file-label-text" class="text-sm font-medium text-slate-600">Файлды осы жерге сүйреңіз немесе таңдаңыз</p>
+                                    <p class="text-xs text-slate-400 mt-1">Максималды көлемі: 20 МБ</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Қысқаша түсініктеме</label>
+                                <textarea id="homework-comment" rows="3" placeholder="Мұғалімге қосымша ескертпе немесе комментарий..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Презентацияны жіберу</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- МҰҒАЛІМ КІРУ МОДАЛЬДІ ТЕРЕЗЕСІ -->
+    <div id="modal-teacher-auth" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 space-y-6 relative animate-in fade-in zoom-in duration-200">
+            <button onclick="closeTeacherAuthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center bg-slate-100">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-2">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900">Мұғалім кабинетіне кіру</h3>
+                <p class="text-sm text-slate-500">Қолжетімділік құпия кодын енгізіңіз</p>
+            </div>
+
+            <form onsubmit="handleTeacherLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Құпия код</label>
+                    <input type="password" id="teacher-code-input" required placeholder="Құпия кодты енгізіңіз" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-base">
+                    <p class="text-xs text-slate-400 mt-1">Демо-код: <b>USTAZ-2026</b></p>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md shadow-indigo-500/20 transition-all text-base">
+                    Кіру <i class="fas fa-sign-in-alt ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ЛОГИКАСЫ & ДЕРЕКТЕР БАЗАСЫ (INDEXEDDB & LOCALSTORAGE) -->
+    <script>
+        // --- ДЕРЕКТЕР МОДЕЛІ ВЕН САКТАУ ҚОЙМАСЫ (LOCALSTORAGE & INDEXEDDB) ---
+
+        const TEACHER_DEMO_CODE = "USTAZ-2026";
+        let db = null;
+
+        // Өнімдегі бастапқы сақтау күйі
+        let appState = {
+            currentUserRole: null, // 'teacher' немесе 'student'
+            studentInfo: null, // { name: '', courseCode: '' }
+            courses: [],
+            materials: [],
+            quizzes: [],
+            assignments: [],
+            testSubmissions: [],
+            homeworkSubmissions: []
+        };
+
+        // Демо-курс деректері (MATH-5A)
+        const DEMO_COURSE = {
+            id: "course-demo-math5a",
+            title: "Теңдеулер",
+            subject: "Математика",
+            grade: "5 «А»",
+            description: "Теңдеулер тақырыбы бойынша негізгі түсініктер, ережелер және оларды шешу тәсілдері.",
+            code: "MATH-5A",
+            maxStudents: 10
+        };
+
+        const DEMO_MATERIAL = {
+            id: "mat-demo-1",
+            courseId: "course-demo-math5a",
+            type: "theory",
+            title: "Теңдеу және оның түбірі",
+            content: `Сабақ мақсаты:
+- теңдеу және оның түбірі ұғымдарын түсіну;
+- қарапайым теңдеулерді шешу;
+- шешімді орнына қою арқылы тексеру.
+
+Теңдеу — құрамында белгісіз саны бар теңдік. Белгісіз сан көбінесе x әрпімен белгіленеді.
+
+Негізгі ережелер:
+- x + a = b болса, x = b − a;
+- x − a = b болса, x = b + a;
+- a − x = b болса, x = a − b;
+- x · a = b болса, x = b : a;
+- x : a = b болса, x = b · a.
+
+Мысалдар:
+1. x + 7 = 15
+   x = 15 − 7
+   x = 8
+
+2. x − 9 = 16
+   x = 16 + 9
+   x = 25
+
+3. 5x = 40
+   x = 40 : 5
+   x = 8`
+        };
+
+        const DEMO_ASSIGNMENT = {
+            id: "assign-demo-1",
+            courseId: "course-demo-math5a",
+            title: "Теңдеулерді шешу бойынша презентация әзірлеу",
+            instructions: "Теңдеулерді шешу мысалдары мен ережелерін қамтитын қысқаша презентация (PPTX) немесе PDF құжатын жүктеңіз.",
+            deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+            maxScore: 100,
+            criteria: "Түсініктілігі, есептердің дұрыстығы, безендірілуі."
+        };
+
+        const DEMO_QUIZZES = [
+            { id: "q1", courseId: "course-demo-math5a", question: "1. x + 8 = 21 теңдеуін шешіңіз:", options: ["x = 12", "x = 13", "x = 14", "x = 15"], correctIndex: 1 },
+            { id: "q2", courseId: "course-demo-math5a", question: "2. x − 14 = 20 теңдеуін шешіңіз:", options: ["x = 34", "x = 6", "x = 24", "x = 30"], correctIndex: 0 },
+            { id: "q3", courseId: "course-demo-math5a", question: "3. 7x = 56 теңдеуін шешіңіз:", options: ["x = 7", "x = 9", "x = 8", "x = 6"], correctIndex: 2 },
+            { id: "q4", courseId: "course-demo-math5a", question: "4. x : 6 = 9 теңдеуін шешіңіз:", options: ["x = 54", "x = 15", "x = 3", "x = 48"], correctIndex: 0 },
+            { id: "q5", courseId: "course-demo-math5a", question: "5. 45 − x = 17 теңдеуін шешіңіз:", options: ["x = 62", "x = 28", "x = 32", "x = 18"], correctIndex: 1 },
+            { id: "q6", courseId: "course-demo-math5a", question: "6. Түбірі 12 болатын теңдеуді анықтаңыз:", options: ["x + 5 = 20", "2x = 24", "x − 3 = 10", "x : 2 = 8"], correctIndex: 1 },
+            { id: "q7", courseId: "course-demo-math5a", question: "7. 3x + 5 = 26 теңдеуін шешіңіз:", options: ["x = 7", "x = 8", "x = 9", "x = 6"], correctIndex: 0 },
+            { id: "q8", courseId: "course-demo-math5a", question: "8. 2x − 6 = 18 теңдеуін шешіңіз:", options: ["x = 10", "x = 12", "x = 14", "x = 8"], correctIndex: 1 },
+            { id: "q9", courseId: "course-demo-math5a", question: "9. x = 9 болатын теңдеуді анықтаңыз:", options: ["5x = 45", "x + 10 = 20", "x − 4 = 6", "3x = 30"], correctIndex: 0 },
+            { id: "q10", courseId: "course-demo-math5a", question: "10. 4x + 8 = 40 теңдеуін шешіңіз:", options: ["x = 6", "x = 7", "x = 8", "x = 9"], correctIndex: 2 }
+        ];
+
+        // --- ИНИЦИАЛИЗАЦИЯ (APP START) ---
+        window.onload = async function() {
+            loadLocalSession();
+            loadStateFromStorage();
+            updateNavigation();
+
+            // Егер сессияда мұғалім болса не оқушы болса тиісті бетті ашу
+            if (appState.currentUserRole === 'teacher') {
+                switchView('teacher-dashboard');
+            } else if (appState.currentUserRole === 'student' && appState.studentInfo) {
+                renderStudentDashboard(appState.studentInfo.courseCode);
+            } else {
+                switchView('home');
+            }
+        };
+
+        // --- САҚТАУ ЛОГИКАСЫ (LOCALSTORAGE) ---
+        function loadLocalSession() {
+            const role = localStorage.getItem('qadam_user_role');
+            if (role === 'teacher') {
+                appState.currentUserRole = 'teacher';
+            } else if (role === 'student') {
+                const sInfo = localStorage.getItem('qadam_student_info');
+                if (sInfo) {
+                    appState.currentUserRole = 'student';
+                    appState.studentInfo = JSON.parse(sInfo);
+                }
+            }
+        }
+
+        function loadStateFromStorage() {
+            const storedCourses = localStorage.getItem('qadam_courses');
+            const storedMaterials = localStorage.getItem('qadam_materials');
+            const storedQuizzes = localStorage.getItem('qadam_quizzes');
+            const storedAssigns = localStorage.getItem('qadam_assignments');
+            const storedResults = localStorage.getItem('qadam_test_results');
+            const storedHW = localStorage.getItem('qadam_homeworks');
+
+            appState.courses = storedCourses ? JSON.parse(storedCourses) : [DEMO_COURSE];
+            appState.materials = storedMaterials ? JSON.parse(storedMaterials) : [DEMO_MATERIAL];
+            appState.quizzes = storedQuizzes ? JSON.parse(storedQuizzes) : [...DEMO_QUIZZES];
+            appState.assignments = storedAssigns ? JSON.parse(storedAssigns) : [DEMO_ASSIGNMENT];
+            appState.testSubmissions = storedResults ? JSON.parse(storedResults) : [];
+            appState.homeworkSubmissions = storedHW ? JSON.parse(storedHW) : [];
+
+            saveStateToStorage();
+        }
+
+        function saveStateToStorage() {
+            localStorage.setItem('qadam_courses', JSON.stringify(appState.courses));
+            localStorage.setItem('qadam_materials', JSON.stringify(appState.materials));
+            localStorage.setItem('qadam_quizzes', JSON.stringify(appState.quizzes));
+            localStorage.setItem('qadam_assignments', JSON.stringify(appState.assignments));
+            localStorage.setItem('qadam_test_results', JSON.stringify(appState.testSubmissions));
+            localStorage.setItem('qadam_homeworks', JSON.stringify(appState.homeworkSubmissions));
+        }
+
+        // --- БЕТТЕР МЕН ТАБТАРДЫ АУЫСТЫРУ (NAVIGATION) ---
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+
+            if (viewName === 'home') {
+                document.getElementById('view-home').classList.remove('hidden');
+            } else if (viewName === 'student-login') {
+                document.getElementById('view-student-login').classList.remove('hidden');
+            } else if (viewName === 'teacher-dashboard') {
+                document.getElementById('view-teacher-dashboard').classList.remove('hidden');
+                renderTeacherDashboard();
+            } else if (viewName === 'student-dashboard') {
+                document.getElementById('view-student-dashboard').classList.remove('hidden');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateNavigation() {
+            const nav = document.getElementById('nav-user-info');
+            if (appState.currentUserRole === 'teacher') {
+                nav.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-lg flex items-center gap-2">
+                            <i class="fas fa-chalkboard-teacher"></i> Мұғалім
+                        </span>
+                        <button onclick="handleLogout()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-xl transition-all">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Шығу
+                        </button>
+                    </div>
+                `;
+            } else if (appState.currentUserRole === 'student' && appState.studentInfo) {
+                nav.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-lg flex items-center gap-2">
+                            <i class="fas fa-user-graduate"></i> ${escapeHtml(appState.studentInfo.name)}
+                        </span>
+                        <button onclick="handleLogout()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-xl transition-all">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Шығу
+                        </button>
+                    </div>
+                `;
+            } else {
+                nav.innerHTML = ``;
+            }
+        }
+
+        function handleLogout() {
+            appState.currentUserRole = null;
+            appState.studentInfo = null;
+            localStorage.removeItem('qadam_user_role');
+            localStorage.removeItem('qadam_student_info');
+            updateNavigation();
+            showToast('Сессия аяқталды', 'info');
+            switchView('home');
+        }
+
+        // --- МҰҒАЛІМ АВТОРИЗАЦИЯСЫ ---
+        function openTeacherAuthModal() {
+            document.getElementById('modal-teacher-auth').classList.remove('hidden');
+        }
+
+        function closeTeacherAuthModal() {
+            document.getElementById('modal-teacher-auth').classList.add('hidden');
+        }
+
+        function handleTeacherLogin(e) {
+            e.preventDefault();
+            const inputCode = document.getElementById('teacher-code-input').value.trim().toUpperCase();
+            
+            if (inputCode === TEACHER_DEMO_CODE) {
+                appState.currentUserRole = 'teacher';
+                localStorage.setItem('qadam_user_role', 'teacher');
+                closeTeacherAuthModal();
+                updateNavigation();
+                showToast('Мұғалім кабинетіне қош келдіңіз!', 'success');
+                switchView('teacher-dashboard');
+                document.getElementById('teacher-code-input').value = '';
+            } else {
+                showToast('Мұғалім коды қате', 'error');
+            }
+        }
+
+        // --- МҰҒАЛІМ КАБИНЕТІНІҢ ФУНКЦИОНАЛЫ ---
+        function renderTeacherDashboard() {
+            // Статистиканы жаңарту
+            document.getElementById('stat-courses').textContent = appState.courses.length;
+            
+            // Uniq тіркелген оқушылар санын есептеу
+            const studentSet = new Set([
+                ...appState.testSubmissions.map(s => s.studentName),
+                ...appState.homeworkSubmissions.map(h => h.studentName)
+            ]);
+            document.getElementById('stat-students').textContent = Math.max(10, studentSet.size);
+
+            document.getElementById('stat-results').textContent = appState.testSubmissions.length;
+            document.getElementById('stat-homeworks').textContent = appState.homeworkSubmissions.length;
+
+            // Селекттерді жаңарту
+            populateCourseSelects();
+
+            // Курстар тізімін render ету
+            renderTeacherCoursesList();
+
+            // Кестелерді render ету
+            renderTestResultsTable();
+            renderHomeworkSubmissionsTable();
+        }
+
+        function switchTeacherTab(tabId) {
+            document.querySelectorAll('.teacher-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.teacher-tab-btn').forEach(btn => {
+                btn.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
+                btn.classList.add('text-slate-600');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
+                activeBtn.classList.remove('text-slate-600');
+            }
+        }
+
+        function populateCourseSelects() {
+            const selects = ['material-course-select', 'quiz-course-select', 'assign-course-select'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = appState.courses.map(c => 
+                        `<option value="${c.id}">${escapeHtml(c.subject)} - ${escapeHtml(c.grade)} (${escapeHtml(c.title)}) [КОД: ${c.code}]</option>`
+                    ).join('');
+                }
+            });
+        }
+
+        function renderTeacherCoursesList() {
+            const container = document.getElementById('courses-list-container');
+            container.innerHTML = appState.courses.map(c => `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg">
+                            ${escapeHtml(c.subject)} • ${escapeHtml(c.grade)}
+                        </span>
+                        <span class="px-3 py-1 bg-slate-100 text-slate-700 font-mono text-xs font-bold rounded-lg tracking-wider">
+                            ${escapeHtml(c.code)}
+                        </span>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-900">${escapeHtml(c.title)}</h4>
+                    <p class="text-sm text-slate-600 line-clamp-2">${escapeHtml(c.description)}</p>
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span><i class="fas fa-users mr-1"></i> Макс. оқушы: ${c.maxStudents}</span>
+                        <span><i class="fas fa-book-open mr-1"></i> ${appState.materials.filter(m => m.courseId === c.id).length} материал</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleCreateCourse(e) {
+            e.preventDefault();
+            const title = document.getElementById('course-title').value.trim();
+            const subject = document.getElementById('course-subject').value.trim();
+            const grade = document.getElementById('course-grade').value.trim();
+            const description = document.getElementById('course-description').value.trim();
+            let code = document.getElementById('course-code').value.trim().toUpperCase();
+            const maxStudents = parseInt(document.getElementById('course-max-students').value) || 30;
+
+            if (!code) {
+                code = subject.substring(0, 3).toUpperCase() + '-' + grade.replace(/[^0-9A-Z]/gi, '');
+            }
+
+            const newCourse = {
+                id: 'course-' + Date.now(),
+                title, subject, grade, description, code, maxStudents
+            };
+
+            appState.courses.push(newCourse);
+            saveStateToStorage();
+            showToast('Курс сәтті құрылды! Кіру коды: ' + code, 'success');
+            e.target.reset();
+            renderTeacherDashboard();
+            switchTeacherTab('tab-courses');
+        }
+
+        function handleAddMaterial(e) {
+            e.preventDefault();
+            const courseId = document.getElementById('material-course-select').value;
+            const type = document.getElementById('material-type').value;
+            const title = document.getElementById('material-title').value.trim();
+            const content = document.getElementById('material-content').value.trim();
+
+            const newMaterial = {
+                id: 'mat-' + Date.now(),
+                courseId, type, title, content
+            };
+
+            appState.materials.push(newMaterial);
+            saveStateToStorage();
+            showToast('Материал сәтті қосылды!', 'success');
+            e.target.reset();
+        }
+
+        function handleAddQuizQuestion(e) {
+            e.preventDefault();
+            const courseId = document.getElementById('quiz-course-select').value;
+            const question = document.getElementById('quiz-question').value.trim();
+            const optA = document.getElementById('quiz-opt-a').value.trim();
+            const optB = document.getElementById('quiz-opt-b').value.trim();
+            const optC = document.getElementById('quiz-opt-c').value.trim();
+            const optD = document.getElementById('quiz-opt-d').value.trim();
+            const correctIndex = parseInt(document.getElementById('quiz-correct-index').value);
+
+            const newQuiz = {
+                id: 'q-' + Date.now(),
+                courseId,
+                question,
+                options: [optA, optB, optC, optD],
+                correctIndex
+            };
+
+            appState.quizzes.push(newQuiz);
+            saveStateToStorage();
+            showToast('Тест сұрағы сақталды!', 'success');
+            e.target.reset();
+        }
+
+        function handleAddAssignment(e) {
+            e.preventDefault();
+            const courseId = document.getElementById('assign-course-select').value;
+            const title = document.getElementById('assign-title').value.trim();
+            const instructions = document.getElementById('assign-instructions').value.trim();
+            const deadline = document.getElementById('assign-deadline').value;
+            const maxScore = parseInt(document.getElementById('assign-max-score').value) || 100;
+            const criteria = document.getElementById('assign-criteria').value.trim();
+
+            const newAssignment = {
+                id: 'assign-' + Date.now(),
+                courseId, title, instructions, deadline, maxScore, criteria
+            };
+
+            appState.assignments.push(newAssignment);
+            saveStateToStorage();
+            showToast('Үй тапсырмасы жарияланды!', 'success');
+            e.target.reset();
+        }
+
+        function renderTestResultsTable() {
+            const body = document.getElementById('test-results-table-body');
+            if (appState.testSubmissions.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">Әлі тест нәтижелері жоқ</td></tr>`;
+                return;
+            }
+
+            body.innerHTML = appState.testSubmissions.map(sub => {
+                const course = appState.courses.find(c => c.id === sub.courseId) || { title: 'Курс' };
+                return `
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="px-6 py-4 font-semibold text-slate-900">${escapeHtml(sub.studentName)}</td>
+                        <td class="px-6 py-4 text-slate-600">${escapeHtml(course.title)}</td>
+                        <td class="px-6 py-4 font-medium text-slate-800">${sub.score} / ${sub.totalQuestions}</td>
+                        <td class="px-6 py-4 font-bold text-emerald-600">${sub.percentage}%</td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${sub.submittedAt}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderHomeworkSubmissionsTable() {
+            const body = document.getElementById('homework-table-body');
+            if (appState.homeworkSubmissions.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">Жіберілген үй тапсырмалары жоқ</td></tr>`;
+                return;
+            }
+
+            body.innerHTML = appState.homeworkSubmissions.map(sub => {
+                const course = appState.courses.find(c => c.id === sub.courseId) || { title: 'Курс' };
+                
+                // Тапсырылған уақыты бойынша статус түсін анықтау
+                let statusBadge = '';
+                if (sub.status === 'late') {
+                    statusBadge = `<span class="px-3 py-1 bg-amber-100 text-amber-700 font-semibold text-xs rounded-full">Кеш тапсырылды</span>`;
+                } else if (sub.status === 'graded') {
+                    statusBadge = `<span class="px-3 py-1 bg-emerald-100 text-emerald-700 font-semibold text-xs rounded-full">Бағаланды</span>`;
+                } else {
+                    statusBadge = `<span class="px-3 py-1 bg-emerald-100 text-emerald-700 font-semibold text-xs rounded-full">Уақытында</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="px-6 py-4 font-semibold text-slate-900">${escapeHtml(sub.studentName)}</td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-slate-800">${escapeHtml(sub.assignmentTitle)}</div>
+                            <div class="text-xs text-slate-400">${escapeHtml(course.title)}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-2 text-sm text-slate-700">
+                                <i class="fas ${sub.fileName.endsWith('.pdf') ? 'fa-file-pdf text-red-500' : 'fa-file-powerpoint text-orange-500'} text-base"></i>
+                                <span>${escapeHtml(sub.fileName)}</span>
+                            </div>
+                            <span class="text-xs text-slate-400">${(sub.fileSize / 1024 / 1024).toFixed(2)} MB</span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${sub.submittedAt}</td>
+                        <td class="px-6 py-4">${statusBadge}</td>
+                        <td class="px-6 py-4">
+                            <a href="${sub.fileDataUrl}" download="${sub.fileName}" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-xs rounded-lg transition-colors inline-flex items-center gap-1">
+                                <i class="fas fa-download"></i> Жүктеу
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- ОҚУШЫ КІРУІ МЕН КАБИНЕТІ ---
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('student-name-input').value.trim();
+            const code = document.getElementById('student-code-input').value.trim().toUpperCase();
+
+            const course = appState.courses.find(c => c.code === code);
+            if (!course) {
+                showToast('Мұндай курс табылмады', 'error');
+                return;
+            }
+
+            appState.currentUserRole = 'student';
+            appState.studentInfo = { name, courseCode: code };
+
+            localStorage.setItem('qadam_user_role', 'student');
+            localStorage.setItem('qadam_student_info', JSON.stringify(appState.studentInfo));
+
+            updateNavigation();
+            showToast('Курсқа сәтті кірдіңіз!', 'success');
+            renderStudentDashboard(code);
+        }
+
+        function renderStudentDashboard(courseCode) {
+            const course = appState.courses.find(c => c.code === courseCode);
+            if (!course) {
+                showToast('Курс табылмады', 'error');
+                switchView('home');
+                return;
+            }
+
+            switchView('student-dashboard');
+
+            // Курс ақпаратын көрсету
+            document.getElementById('student-course-badge').textContent = `${course.subject.toUpperCase()} • ${course.grade}`;
+            document.getElementById('student-course-code-tag').textContent = `КОД: ${course.code}`;
+            document.getElementById('student-course-title').textContent = course.title;
+            document.getElementById('student-course-desc').textContent = course.description;
+
+            // Материалдарды render ету
+            const courseMaterials = appState.materials.filter(m => m.courseId === course.id);
+            const materialsContainer = document.getElementById('student-materials-list');
+
+            if (courseMaterials.length === 0) {
+                materialsContainer.innerHTML = `<p class="text-slate-400 text-sm">Әлі теориялық материалдар жарияланбаған.</p>`;
+            } else {
+                materialsContainer.innerHTML = courseMaterials.map(m => `
+                    <div class="p-5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-lg font-bold text-slate-900">${escapeHtml(m.title)}</h4>
+                            <span class="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full uppercase">
+                                ${m.type === 'theory' ? 'Теория' : m.type === 'task' ? 'Тапсырма' : 'Тренажер'}
+                            </span>
+                        </div>
+                        <div class="text-slate-700 text-base leading-relaxed whitespace-pre-line font-normal">
+                            ${escapeHtml(m.content)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Тест сұрақтарын render ету
+            renderStudentQuiz(course.id);
+
+            // Үй тапсырмасы ақпаратын render ету
+            renderStudentAssignmentInfo(course.id);
+        }
+
+        function renderStudentQuiz(courseId) {
+            const quizzes = appState.quizzes.filter(q => q.courseId === courseId);
+            const container = document.getElementById('student-quiz-questions-container');
+            const submitBtn = document.getElementById('quiz-submit-btn');
+            const resultBox = document.getElementById('student-quiz-result-box');
+            const form = document.getElementById('student-quiz-form');
+
+            // Бұрын тапсырғанын тексеру
+            const previousSub = appState.testSubmissions.find(s => 
+                s.courseId === courseId && s.studentName === appState.studentInfo.name
+            );
+
+            if (previousSub) {
+                form.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                document.getElementById('quiz-status-badge').textContent = 'Тапсырылды';
+                document.getElementById('quiz-status-badge').className = 'px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200';
+                document.getElementById('quiz-res-score').textContent = `${previousSub.score} / ${previousSub.totalQuestions}`;
+                document.getElementById('quiz-res-percent').textContent = `${previousSub.percentage}%`;
+                return;
+            }
+
+            form.classList.remove('hidden');
+            resultBox.classList.add('hidden');
+
+            if (quizzes.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 text-sm">Осы курс бойынша тест сұрақтары әлі дайын емес.</p>`;
+                submitBtn.classList.add('hidden');
+                return;
+            }
+
+            submitBtn.classList.remove('hidden');
+            container.innerHTML = quizzes.map((q, qIndex) => `
+                <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                    <p class="font-bold text-slate-900 text-base">${escapeHtml(q.question)}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${q.options.map((opt, optIndex) => `
+                            <label class="flex items-center space-x-3 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-blue-500 transition-colors">
+                                <input type="radio" name="quiz_q_${q.id}" value="${optIndex}" required class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm font-medium text-slate-700">${escapeHtml(opt)}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleStudentQuizSubmit(e) {
+            e.preventDefault();
+            const course = appState.courses.find(c => c.code === appState.studentInfo.courseCode);
+            if (!course) return;
+
+            const quizzes = appState.quizzes.filter(q => q.courseId === course.id);
+            let score = 0;
+
+            quizzes.forEach(q => {
+                const selected = document.querySelector(`input[name="quiz_q_${q.id}"]:checked`);
+                if (selected && parseInt(selected.value) === q.correctIndex) {
+                    score++;
+                }
+            });
+
+            const total = quizzes.length;
+            const percentage = Math.round((score / total) * 100);
+            const now = new Date().toLocaleString('kk-KZ');
+
+            const submission = {
+                id: 'sub-' + Date.now(),
+                courseId: course.id,
+                studentName: appState.studentInfo.name,
+                score,
+                totalQuestions: total,
+                percentage,
+                submittedAt: now
+            };
+
+            appState.testSubmissions.push(submission);
+            saveStateToStorage();
+
+            showToast('Тест жауаптары жіберілді!', 'success');
+            renderStudentQuiz(course.id);
+        }
+
+        function renderStudentAssignmentInfo(courseId) {
+            const assignment = appState.assignments.find(a => a.courseId === courseId);
+            const infoContainer = document.getElementById('student-assignment-info');
+
+            if (!assignment) {
+                infoContainer.innerHTML = `<p class="text-slate-500 text-sm">Қазiрше үй тапсырмасы жарияланбаған.</p>`;
+                return;
+            }
+
+            const deadlineDate = new Date(assignment.deadline);
+            infoContainer.innerHTML = `
+                <h4 class="font-bold text-slate-900 text-base">${escapeHtml(assignment.title)}</h4>
+                <p class="text-sm text-slate-600">${escapeHtml(assignment.instructions)}</p>
+                <div class="pt-2 border-t border-slate-200 text-xs text-slate-500 space-y-1">
+                    <div><b>Соңғы мерзімі (Дедлайн):</b> ${deadlineDate.toLocaleString('kk-KZ')}</div>
+                    <div><b>Максималды балл:</b> ${assignment.maxScore}</div>
+                    ${assignment.criteria ? `<div><b>Критерийлер:</b> ${escapeHtml(assignment.criteria)}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function updateFileLabel(input) {
+            const labelText = document.getElementById('file-label-text');
+            if (input.files && input.files[0]) {
+                labelText.textContent = `Таңдалған файл: ${input.files[0].name}`;
+                labelText.classList.add('text-blue-600', 'font-bold');
+            }
+        }
+
+        function handleStudentHomeworkSubmit(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('homework-file-input');
+            const comment = document.getElementById('homework-comment').value.trim();
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showToast('Файлды таңдаңыз', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+
+            // 1. Көлемін тексеру (20 МБ = 20 * 1024 * 1024 bytes)
+            if (file.size > 20 * 1024 * 1024) {
+                showToast('Файл көлемі 20 МБ-тан аспауы керек', 'error');
+                return;
+            }
+
+            // 2. Файл кеңейтімі мен MIME типін тексеру
+            const allowedExts = ['.pdf', '.pptx'];
+            const allowedMimes = [
+                'application/pdf',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            ];
+
+            const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowedExts.includes(fileExt) && !allowedMimes.includes(file.type)) {
+                showToast('Тек PDF немесе PPTX файлын жүктеңіз', 'error');
+                return;
+            }
+
+            const course = appState.courses.find(c => c.code === appState.studentInfo.courseCode);
+            const assignment = appState.assignments.find(a => a.courseId === (course ? course.id : ''));
+            const assignmentTitle = assignment ? assignment.title : 'Үй тапсырмасы';
+
+            // Дедлайн тексеру (уақытында ма, кеш пе)
+            let status = 'on_time';
+            if (assignment && assignment.deadline) {
+                if (new Date() > new Date(assignment.deadline)) {
+                    status = 'late';
+                }
+            }
+
+            // Файлды DataURL түрінде сақтау
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const fileDataUrl = evt.target.result;
+                const now = new Date().toLocaleString('kk-KZ');
+
+                const homeworkSub = {
+                    id: 'hw-' + Date.now(),
+                    courseId: course ? course.id : '',
+                    assignmentTitle,
+                    studentName: appState.studentInfo.name,
+                    fileName: file.name,
+                    fileSize: file.size,
+                    fileDataUrl,
+                    submittedAt: now,
+                    comment,
+                    status
+                };
+
+                appState.homeworkSubmissions.push(homeworkSub);
+                saveStateToStorage();
+
+                showToast('Үй тапсырмасы мұғалімге жіберілді', 'success');
+                e.target.reset();
+                document.getElementById('file-label-text').textContent = 'Файлды осы жерге сүйреңіз немесе таңдаңыз';
+                document.getElementById('file-label-text').className = 'text-sm font-medium text-slate-600';
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        // --- ТОАСТ / ХАБАРЛАМА КӨРСЕТУ ---
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            msg.textContent = message;
+
+            if (type === 'success') {
+                toast.className = "fixed bottom-5 right-5 z-50 transform opacity-100 translate-y-0 transition-all duration-300 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-white font-medium bg-emerald-600";
+                icon.className = "fas fa-check-circle text-xl";
+            } else if (type === 'error') {
+                toast.className = "fixed bottom-5 right-5 z-50 transform opacity-100 translate-y-0 transition-all duration-300 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-white font-medium bg-rose-600";
+                icon.className = "fas fa-exclamation-triangle text-xl";
+            } else {
+                toast.className = "fixed bottom-5 right-5 z-50 transform opacity-100 translate-y-0 transition-all duration-300 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 text-white font-medium bg-blue-600";
+                icon.className = "fas fa-info-circle text-xl";
+            }
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-20');
+            }, 3500);
+        }
+
+        // Qauipsizlik HTML Escape
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
